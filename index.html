@@ -2273,8 +2273,9 @@
   /* Controls row */
   .savecalc-controls {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    grid-template-columns: 1fr 2fr;
+    gap: 24px;
+    align-items: start;
     margin-bottom: 36px;
   }
   .savecalc-field label {
@@ -2324,7 +2325,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 40px;
+    margin-top: 10px;
   }
   .sc-pill {
     padding: 9px 18px;
@@ -2379,8 +2380,6 @@
     font-weight: 700;
     color: rgba(255,255,255,0.5);
     transition: all 0.35s;
-    text-decoration: line-through;
-    text-decoration-color: rgba(255,255,255,0.2);
   }
   .sc-price-col.gf .savecalc-col-price {
     color: var(--gold);
@@ -3089,7 +3088,7 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    background: rgba(196,154,108,0.13);
+    background: #f0eddf;
     border: 1.5px solid rgba(196,154,108,0.5);
     display: flex;
     align-items: center;
@@ -3097,12 +3096,12 @@
     color: var(--gold);
     margin-bottom: 20px;
     position: relative;
-    z-index: 1;
+    z-index: 2;
     flex-shrink: 0;
     transition: background 0.3s, border-color 0.3s;
   }
   .cj-card:hover .cj-icon-wrap {
-    background: rgba(196,154,108,0.22);
+    background: #ebe5d4;
     border-color: var(--gold);
   }
   .cj-icon-wrap svg {
@@ -4925,7 +4924,7 @@
       <p class="savecalc-sub">Pick your country and treatment — see your real saving in your currency.</p>
     </div>
 
-    <!-- Country selector -->
+    <!-- Country + Treatment selector -->
     <div class="savecalc-controls">
       <div class="savecalc-field">
         <label>Your Country</label>
@@ -4958,16 +4957,14 @@
             <option value="whitening">Teeth Whitening</option>
           </select>
         </div>
+        <div class="sc-pills">
+          <button class="sc-pill active" onclick="setPill(this,'implant')">Single Implant</button>
+          <button class="sc-pill" onclick="setPill(this,'allon4')">All-on-4</button>
+          <button class="sc-pill" onclick="setPill(this,'veneers')">Veneers (10)</button>
+          <button class="sc-pill" onclick="setPill(this,'crown')">Single Crown</button>
+          <button class="sc-pill" onclick="setPill(this,'whitening')">Whitening</button>
+        </div>
       </div>
-    </div>
-
-    <!-- Treatment pills -->
-    <div class="sc-pills">
-      <button class="sc-pill active" onclick="setPill(this,'implant')">Single Implant</button>
-      <button class="sc-pill" onclick="setPill(this,'allon4')">All-on-4</button>
-      <button class="sc-pill" onclick="setPill(this,'veneers')">Veneers (10)</button>
-      <button class="sc-pill" onclick="setPill(this,'crown')">Single Crown</button>
-      <button class="sc-pill" onclick="setPill(this,'whitening')">Whitening</button>
     </div>
 
     <!-- Result card -->
