@@ -2380,10 +2380,22 @@
     font-weight: 700;
     color: rgba(255,255,255,0.5);
     transition: all 0.35s;
+    position: relative;
+    display: inline-block;
+  }
+  .sc-price-col:not(.gf) .savecalc-col-price::after {
+    content: '';
+    position: absolute;
+    left: -4%;
+    right: -4%;
+    top: 50%;
+    height: 3px;
+    background: rgba(255,255,255,0.7);
+    transform: translateY(-50%);
+    border-radius: 2px;
   }
   .sc-price-col.gf .savecalc-col-price {
     color: var(--gold);
-    text-decoration: none;
     font-size: 42px;
   }
   .sc-vs {
