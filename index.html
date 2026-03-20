@@ -35,6 +35,16 @@
     });
   }
 </script>
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '26443098325275263');
+fbq('track', 'PageView');
+</script>
 <meta property="og:title" content="Dental Implants Vietnam 2026 | All-on-4 · All-on-6 | Greenfield Dental Hanoi">
 <meta property="og:description" content="Save 60–80% on dental implants, All-on-4 and All-on-6 full arch in Hanoi Vietnam. Straumann, Neodent & Dentium. ISO-certified clinic, 1,000+ international patients. Free quote in 24hrs.">
 <meta property="og:type" content="article">
@@ -140,7 +150,7 @@
 <!-- Resource hints: third-party domains -->
 <link rel="dns-prefetch" href="https://img.youtube.com">
 <link rel="dns-prefetch" href="https://www.youtube.com">
-<link rel="dns-prefetch" href="https://formsubmit.co">
+<link rel="dns-prefetch" href="https://api.greenfield.clinic">
 <link rel="dns-prefetch" href="https://flagcdn.com">
 <link rel="dns-prefetch" href="https://ipapi.co">
 <link rel="dns-prefetch" href="https://www.google.com">
@@ -6034,11 +6044,137 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 });
+
+// ══════════════════════════════════════════════════════════════
+// LEAD CAPTURE — 5-Layer Protection Pattern
+// ══════════════════════════════════════════════════════════════
+
+var API_BASE = 'https://api.greenfield.clinic/api/leads/dental-tourism';
+var SHEET_WEBHOOK = 'https://script.google.com/macros/s/AKfycbyZuUTZJ82bNgLtuze0B6sro0VKUWkvCUcACZKvPI7soGY5-gP8qvbrTMVr5eZrVmiuxA/exec';
+var WHATSAPP_NUMBER = '84906621988';
+
+// UTM capture on page load
+var utmData = (function() {
+  var p = new URLSearchParams(window.location.search);
+  return {
+    utmSource: p.get('utm_source') || '',
+    utmMedium: p.get('utm_medium') || '',
+    utmCampaign: p.get('utm_campaign') || '',
+    utmTerm: p.get('utm_term') || '',
+    utmContent: p.get('utm_content') || '',
+  };
+})();
+
+// Layer 2: Google Sheet backup (fires on EVERY submission)
+function sendToSheet(leadData, formName, apiOk) {
+  if (!SHEET_WEBHOOK) return;
+  fetch(SHEET_WEBHOOK, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: leadData.name || '', phone: leadData.phone || '',
+      email: leadData.email || '', treatment: leadData.treatment || '',
+      timeline: leadData.timeline || '', country: leadData.country || '',
+      contactPreference: leadData.contactPreference || '',
+      notes: leadData.notes || '', form: formName,
+      apiStatus: apiOk ? 'success' : 'failed',
+      utmSource: leadData.utmSource || '', utmMedium: leadData.utmMedium || '',
+      utmCampaign: leadData.utmCampaign || '',
+    }),
+    mode: 'no-cors',
+  }).catch(function(){});
+}
+
+// Layer 4: localStorage queue for retry
+function queueLead(leadData) {
+  try {
+    var queue = JSON.parse(localStorage.getItem('leadQueue') || '[]');
+    queue.push(Object.assign({}, leadData, { queuedAt: new Date().toISOString() }));
+    localStorage.setItem('leadQueue', JSON.stringify(queue));
+  } catch(e) {}
+}
+
+function flushLeadQueue() {
+  try {
+    var queue = JSON.parse(localStorage.getItem('leadQueue') || '[]');
+    if (!queue.length) return;
+    var fresh = queue.filter(function(l) {
+      return (Date.now() - new Date(l.queuedAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
+    });
+    fresh.forEach(function(lead) {
+      fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lead),
+      }).then(function(res) {
+        if (res.ok) {
+          var remaining = JSON.parse(localStorage.getItem('leadQueue') || '[]');
+          localStorage.setItem('leadQueue',
+            JSON.stringify(remaining.filter(function(l) { return l.queuedAt !== lead.queuedAt; })));
+        }
+      }).catch(function(){});
+    });
+  } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', flushLeadQueue);
+
+// Layer 5: WhatsApp fallback
+function whatsappFallback(leadData) {
+  var msg = encodeURIComponent(
+    'I\'d like a consultation:\nName: ' + (leadData.name || '') +
+    '\nPhone: ' + (leadData.phone || '') +
+    '\nEmail: ' + (leadData.email || 'N/A') +
+    '\nTreatment: ' + (leadData.treatment || 'N/A')
+  );
+  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg);
+}
+
+// Conversion tracking (fires on every form submit)
+function fireConversions(formName, apiOk) {
+  try { gtag('event', 'conversion', { send_to: 'AW-11508258289/ak2wCKyC3PwZEPGryO8q' }); } catch(e) {}
+  try { gtag('event', 'generate_lead', { currency: 'AUD', value: 1.0 }); } catch(e) {}
+  try { fbq('track', 'Lead', { content_name: formName }); } catch(e) {}
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event: 'form_submit', formName: formName, api_success: apiOk });
+}
+
+// Core submission handler — 5-layer pattern
+async function submitLeadData(leadData, formName) {
+  var apiOk = false;
+
+  // Layer 1: Greenfield API
+  try {
+    var res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(leadData),
+    });
+    apiOk = res.ok;
+  } catch(e) {
+    apiOk = false;
+  }
+
+  // Layer 2: Google Sheet (ALWAYS)
+  sendToSheet(leadData, formName, apiOk);
+
+  // Layers 4 & 5: On failure
+  if (!apiOk) {
+    queueLead(leadData);
+    whatsappFallback(leadData);
+  }
+
+  // Tracking (always)
+  fireConversions(formName, apiOk);
+
+  return apiOk;
+}
+
+// ── Multi-step Form ──
 function submitForm() {
-  const firstName = (document.getElementById('msFirstName').value || '').trim();
-  const lastName  = (document.getElementById('msLastName').value || '').trim();
-  const email     = (document.getElementById('msEmail').value || '').trim();
-  const phone     = (document.getElementById('msPhone').value || '').trim();
+  var firstName = (document.getElementById('msFirstName').value || '').trim();
+  var lastName  = (document.getElementById('msLastName').value || '').trim();
+  var email     = (document.getElementById('msEmail').value || '').trim();
+  var phone     = (document.getElementById('msPhone').value || '').trim();
   if (!firstName || !email || !phone) {
     var btn = document.querySelector('.msform-btn-submit');
     var err = document.createElement('p');
@@ -6047,32 +6183,27 @@ function submitForm() {
     if (btn) { btn.parentNode.insertBefore(err, btn.nextSibling); setTimeout(function(){ err.remove(); }, 4000); }
     return;
   }
-  const treatment = (document.querySelector('input[name="treatment"]:checked') || {}).value || 'Not selected';
-  const contact   = (document.querySelector('input[name="contact"]:checked') || {}).value || '';
-  const timeline  = (document.getElementById('msTimeline').value || '');
-  const notes     = (document.getElementById('msNotes').value || '').trim();
-  const payload = {
-    _subject: 'New Consultation Request — Greenfield Dental',
-    Name: firstName + ' ' + lastName,
-    Email: email,
-    Phone: phone,
-    Postcode: '',
-    Treatment: treatment,
-    Timeline: timeline,
-    'Preferred Contact': contact,
-    Notes: notes || '—',
-    Source: 'Multi-step Form'
-  };
-  fetch('https://formsubmit.co/ajax/Hello@nhakhoagreenfield.com', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(function(){});
+  var treatment = (document.querySelector('input[name="treatment"]:checked') || {}).value || 'Not selected';
+  var contact   = (document.querySelector('input[name="contact"]:checked') || {}).value || '';
+  var timeline  = (document.getElementById('msTimeline').value || '');
+  var notes     = (document.getElementById('msNotes').value || '').trim();
+
+  submitLeadData({
+    name: firstName + ' ' + lastName,
+    phone: phone,
+    email: email,
+    treatment: treatment,
+    timeline: timeline,
+    contactPreference: contact,
+    notes: notes || '',
+    source: 'Multi-step Form',
+    ...utmData,
+  }, 'dental-tourism-multistep');
+
   document.querySelectorAll('.msform-step').forEach(s => s.classList.remove('active'));
   document.getElementById('stepSuccess').classList.add('active');
   document.getElementById('progressBar').style.width = '100%';
   document.getElementById('stepLabel').textContent = 'All done!';
-  setTimeout(function(){ window.location.href = '/3thankyou'; }, 1200);
 }
 
 // ── Gallery filter ──
@@ -6229,36 +6360,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // ── Hero Form ──
 function submitHeroForm() {
-  const email     = document.getElementById('hfcEmail').value.trim();
-  const phone     = document.getElementById('hfcPhone').value.trim();
+  var email = document.getElementById('hfcEmail').value.trim();
+  var phone = document.getElementById('hfcPhone').value.trim();
   if (!email || !phone) {
     var errEl = document.getElementById('hfcError') || document.getElementById('msError');
     if (errEl) { errEl.textContent = 'Please enter your email and WhatsApp/phone number.'; errEl.style.display='block'; }
     else { var f=document.querySelector('.hfc-submit'); if(f){var e=document.createElement('p');e.style.cssText='color:#ff6b6b;font-size:13px;margin-top:8px;text-align:center;';e.textContent='Please enter your email and WhatsApp/phone number.';f.parentNode.insertBefore(e,f.nextSibling);setTimeout(function(){e.remove();},4000);} }
     return;
   }
-  const payload = {
-    _subject: 'New Lead — Greenfield Dental',
-    Email: email,
-    Phone: phone,
-    Source: 'Hero Form'
-  };
-  fetch('https://formsubmit.co/ajax/Hello@nhakhoagreenfield.com', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify(payload)
-  }).catch(function(){});
+
+  submitLeadData({
+    name: '',
+    phone: phone,
+    email: email,
+    source: 'Hero Form',
+    ...utmData,
+  }, 'dental-tourism-hero');
+
   document.getElementById('hfcForm').style.display = 'none';
   document.getElementById('hfcSuccess').style.display = 'flex';
-  setTimeout(function(){ window.location.href = '/3thankyou'; }, 1200);
 }
 
 function submitMiniForm() {
-  const wrap = document.getElementById('mfFormWrap');
+  var wrap = document.getElementById('mfFormWrap');
+  // Try to extract any input values from the mini form
+  var inputs = wrap ? wrap.querySelectorAll('input') : [];
+  var data = { name: '', phone: '', email: '', source: 'Mini Form' };
+  inputs.forEach(function(inp) {
+    var t = (inp.type || '').toLowerCase();
+    var v = (inp.value || '').trim();
+    if (t === 'email') data.email = v;
+    else if (t === 'tel') data.phone = v;
+    else if (t === 'text' && !data.name) data.name = v;
+  });
+
+  if (data.phone || data.email) {
+    submitLeadData(Object.assign(data, utmData), 'dental-tourism-mini');
+  }
+
   if (wrap) {
     wrap.innerHTML = '<div class="mf-success">Thank you — your request has been received. Our specialist will contact you within 24 hours.</div>';
   }
-  setTimeout(function(){ window.location.href = '/3thankyou'; }, 1200);
 }
 
 // ── Interactive Checklist ──
@@ -6828,6 +6970,21 @@ function gcRunState(state) {
   gcState = state;
   var s = FLOW[state];
   if (!s) return;
+
+  // Submit lead data when guided chat reaches confirmed state
+  if (state === 'confirmed' && gcProfile.name) {
+    submitLeadData({
+      name: gcProfile.name || '',
+      phone: gcProfile.whatsapp || '',
+      email: '',
+      treatment: gcProfile.treatment || '',
+      country: gcProfile.country || '',
+      contactPreference: 'WhatsApp',
+      notes: gcProfile.concern ? 'Concern: ' + gcProfile.concern : '',
+      source: 'Guided Chat (Sam)',
+      ...utmData,
+    }, 'dental-tourism-chat');
+  }
 
   // Hide inputs
   document.getElementById('gcQuickWrap').innerHTML = '';
