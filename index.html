@@ -2218,6 +2218,7 @@ fbq('track', 'PageView');
     .benefits-grid, .reviews-grid { grid-template-columns: 1fr; }
     .gallery-grid { grid-template-columns: repeat(2, 1fr); }
     :root { --section-pad: 60px 5%; }
+    .hidden-mobile { display: none; }
   }
 
   /* ══════════════════════════════════════════════════════
@@ -5562,7 +5563,7 @@ fbq('track', 'PageView');
 <!-- REVIEWS -->
 <section class="reviews" aria-label="Patient Reviews">
   <div class="section-label">What Patients Say</div>
-  <h2>Trusted by Patients <em>Worldwide</em></h2>
+  <h2>Trusted by Patients<br class="hidden-mobile"> <em>Worldwide</em></h2>
   <p style="text-align:center;font-size:14px;color:#888;margin-bottom:36px;margin-top:-12px;"><a href="https://g.page/greenfield-dental-hanoi" target="_blank" rel="noopener" style="color:#c49a6c;text-decoration:none;">★★★★★ 4.9 — 174+ Verified Google Reviews</a></p>
   <div class="reviews-grid">
     <div class="review-card">
