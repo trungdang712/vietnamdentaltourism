@@ -5,6 +5,39 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>G-Flex Clear Aligners — Greenfield Dental Vietnam</title>
 <meta name="description" content="G-Flex clear aligners at Greenfield Dental Vietnam — ISO-certified, AI-guided. Save up to 70% vs Australian, UK & US prices. Free cost comparison.">
+<!-- Facebook Pixel -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '26443098325275263');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=26443098325275263&ev=PageView&noscript=1"/></noscript>
+
+<!-- Google Consent Mode v2 — must run BEFORE GTM -->
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('consent', 'default', {
+    'analytics_storage': 'denied',
+    'ad_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied',
+    'wait_for_update': 500
+  });
+  if (localStorage.getItem('cookieConsent') === 'accepted') {
+    gtag('consent', 'update', {
+      'analytics_storage': 'granted',
+      'ad_storage': 'granted',
+      'ad_user_data': 'granted',
+      'ad_personalization': 'granted'
+    });
+  }
+</script>
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-P9F52DWS');</script>
+<!-- End Google Tag Manager -->
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="_TNM8935_preview.jpg">
@@ -851,7 +884,23 @@ p{text-wrap:pretty;}
 </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P9F52DWS" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
 <div id="scroll-bar"></div>
+
+<!-- COOKIE CONSENT BANNER -->
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#fff;border-top:1px solid rgba(8,35,24,.1);padding:16px 24px;display:none;align-items:center;gap:16px;flex-wrap:wrap;box-shadow:0 -4px 32px rgba(8,35,24,.08);" role="dialog" aria-label="Cookie consent">
+  <div style="flex:1;min-width:240px;">
+    <strong style="font-size:14px;font-weight:700;color:#0a1f10;display:block;margin-bottom:4px;">We use cookies</strong>
+    <p style="font-size:12px;color:#587040;line-height:1.6;margin:0;">We use cookies to improve your experience, analyse site traffic, and measure ad effectiveness. <a href="#" style="color:var(--green);text-decoration:underline;">Privacy Policy</a></p>
+  </div>
+  <div style="display:flex;gap:10px;flex-shrink:0;">
+    <button onclick="cookieDecline()" style="font-size:13px;font-weight:600;padding:9px 18px;border-radius:980px;border:1px solid rgba(8,35,24,.15);background:transparent;color:#587040;cursor:pointer;">Decline</button>
+    <button onclick="cookieAccept()" style="font-size:13px;font-weight:700;padding:9px 20px;border-radius:980px;border:none;background:var(--green);color:#fff;cursor:pointer;">Accept All</button>
+  </div>
+</div>
 
 <!-- NAV -->
 <nav id="nav">
@@ -1536,11 +1585,31 @@ async function handleSubmit(e){
   if(!ok){
     try{ await fetch('https://script.google.com/macros/s/AKfycbyGbGECJXDT5WqKh4V-o8OcEPAKMD91JBZ5Y7mM_FXDIZ0e3sHr1dBW2TXg1KuPJQ/exec',{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({...data,formPrefix:'gflex-consultation'})}); }catch{}
   }
+  // Fire tracking conversions
+  if(typeof fbq !== 'undefined') fbq('track', 'Lead', {content_name:'gflex-consultation'});
+  if(typeof gtag !== 'undefined'){
+    gtag('event', 'generate_lead', {currency:'AUD', value:300});
+    gtag('event', 'conversion', {'send_to':'AW-11508258289/ak2wCKyC3PwZEPGryO8q'});
+  }
   btn.disabled = false;
   btn.textContent = 'Done — we\'ll be in touch within 24 hours';
   btn.classList.add('ok');
   e.target.reset();
   setTimeout(()=>{ btn.textContent='Get My Free Cost Comparison'; btn.classList.remove('ok'); }, 7000);
+}
+
+// Cookie consent
+function cookieAccept(){
+  localStorage.setItem('cookieConsent','accepted');
+  if(typeof gtag !== 'undefined') gtag('consent','update',{'analytics_storage':'granted','ad_storage':'granted','ad_user_data':'granted','ad_personalization':'granted'});
+  document.getElementById('cookieBanner').style.display='none';
+}
+function cookieDecline(){
+  localStorage.setItem('cookieConsent','declined');
+  document.getElementById('cookieBanner').style.display='none';
+}
+if(!localStorage.getItem('cookieConsent')){
+  setTimeout(()=>{ document.getElementById('cookieBanner').style.display='flex'; }, 1500);
 }
 
 // Testimonial carousel dot indicator
