@@ -5978,6 +5978,7 @@ fbq('track', 'PageView');
 
 <!-- FLOATING STICKY CTA -->
 
+<script src="detect-visitor.js?v=1" defer></script>
 <script>
 // ── Counter animation ──
 function animateCounters() {
@@ -6147,6 +6148,14 @@ function fireConversions(formName, apiOk) {
 
 // Core submission handler — 5-layer pattern
 async function submitLeadData(leadData, formName) {
+  // Enrich with visitor geo-detection data
+  var vd = window.visitorData || {};
+  if (vd.country) leadData.country = leadData.country || vd.country;
+  if (vd.preferredLanguage) leadData.preferredLanguage = leadData.preferredLanguage || vd.preferredLanguage;
+
+  // Strip empty email — DTO @IsEmail() rejects '' even with @IsOptional()
+  if (!leadData.email) delete leadData.email;
+
   var apiOk = false;
 
   // Layer 1: Greenfield API
