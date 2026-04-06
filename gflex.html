@@ -38,6 +38,16 @@ fbq('track', 'PageView');
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-P9F52DWS');</script>
 <!-- End Google Tag Manager -->
 
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-CWRXTWQLBW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-CWRXTWQLBW');
+</script>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="image" href="_TNM8935_preview.jpg">
@@ -1493,7 +1503,7 @@ p{text-wrap:pretty;}
         <select id="country" name="country">
           <option value="">Select your country</option>
           <option value="AU">Australia</option>
-          <option value="UK">United Kingdom</option>
+          <option value="GB">United Kingdom</option>
           <option value="US">United States</option>
           <option value="CA">Canada</option>
           <option value="NZ">New Zealand</option>
@@ -1567,17 +1577,36 @@ function toggleFaq(btn){
 }
 
 // Form
+var utmData = (function() {
+  var p = new URLSearchParams(window.location.search);
+  return {
+    utmSource: p.get('utm_source') || '',
+    utmMedium: p.get('utm_medium') || '',
+    utmCampaign: p.get('utm_campaign') || '',
+    utmTerm: p.get('utm_term') || '',
+    utmContent: p.get('utm_content') || '',
+  };
+})();
+
 async function handleSubmit(e){
   e.preventDefault();
   const btn = document.getElementById('submitBtn');
   const fd = new FormData(e.target);
+  const countryCode = fd.get('country') || '';
+  var countryName = countryCode;
+  try { countryName = new Intl.DisplayNames(['en'], { type: 'region' }).of(countryCode) || countryCode; } catch(_) {}
+  const vd = window.visitorData || {};
   const data = {
     firstName:fd.get('firstName'), lastName:fd.get('lastName'),
     email:fd.get('email'), phone:fd.get('phone')||'',
-    country:fd.get('country')||'', treatment:fd.get('treatment')||'',
+    country: countryName, countryCode: countryCode,
+    treatment:fd.get('treatment')||'',
     source:'gflex-landing', service:'clear-aligners',
-    submittedAt:new Date().toISOString()
+    submittedAt:new Date().toISOString(),
+    preferredLanguage: vd.preferredLanguage || 'en',
+    ...utmData,
   };
+  if (vd.countryCode && !data.countryCode) { data.countryCode = vd.countryCode; data.country = vd.country || countryName; }
   btn.textContent = 'Sending...'; btn.disabled = true;
   try{ const ex = JSON.parse(localStorage.getItem('gflex_leads')||'[]'); ex.push(data); localStorage.setItem('gflex_leads',JSON.stringify(ex)); }catch{}
   let ok = false;
@@ -1657,5 +1686,6 @@ if(!localStorage.getItem('cookieConsent')){
     <button id="m-bar-btn" onclick="scroll2('consult')">Get Free Quote</button>
   </div>
 </div>
+<script src="detect-visitor.js?v=1" defer></script>
 </body>
 </html>
