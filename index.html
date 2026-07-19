@@ -4118,6 +4118,27 @@
 .hero-eyebrow { line-height: 18px !important; }
 .hero-urgency { line-height: 16px !important; }
 .hfc-title { min-height: 1.3em; }
+
+/* MOBILE LCP: the form card is first in viewport on mobile (order:-1) and its .hfc-sub is
+   the LCP element. Its backdrop-filter blur over the gradient hero cost ~1.5s of element
+   render delay on PSI's throttled hardware. On mobile only, swap the glass blur for a
+   near-identical solid tint and drop the invisible blur(50px) hero blob + nav blur.
+   Desktop (>900px, already scoring 97) keeps the full glassmorphism. */
+@media (max-width: 900px) {
+  .hero-form-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(18,62,62,0.92) !important;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.2) !important;
+  }
+  .hero::after { display: none !important; }
+  nav {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(10,72,72,0.97) !important;
+  }
+  .hero-eyebrow { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+}
 </style>
 <style>
 /* ── CHAT WIDGET ── */
