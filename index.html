@@ -60,7 +60,10 @@
     var fb=document.createElement('script');fb.async=true;fb.src='https://connect.facebook.net/en_US/fbevents.js';document.head.appendChild(fb);
   }
   ['click','touchstart','scroll','keydown','mousemove'].forEach(function(ev){window.addEventListener(ev,loadTracking,{once:true,passive:true});});
-  setTimeout(loadTracking,3500);})();
+  // Fallback: load during idle AFTER the page has loaded, so tracking never competes with the
+  // critical render / LCP finalization (which previously caused intermittent NO_LCP on throttled mobile).
+  var idle=function(){ (window.requestIdleCallback||function(cb){setTimeout(cb,6000);})(loadTracking,{timeout:6000}); };
+  if(document.readyState==='complete') idle(); else window.addEventListener('load',idle);})();
 </script>
 <meta property="og:title" content="Dental Implants Vietnam 2026 | All-on-4 · All-on-6 | Greenfield Dental Hanoi">
 <meta property="og:description" content="Save 60–80% on dental implants, All-on-4 and All-on-6 full arch in Hanoi Vietnam. Straumann, Neodent & Dentium. ISO-certified clinic, 1,000+ international patients. Free quote in 24hrs.">
