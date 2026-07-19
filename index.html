@@ -261,21 +261,15 @@
     text-rendering: optimizeLegibility;
   }
 
-  /* ── CORE WEB VITALS: content-visibility for off-screen sections ── */
-  .yt-testimonials,
-  .gallery,
-  .ba-section,
-  .reviews-section,
-  .reviews,
-  .guarantee-section,
-  .faq-section,
-  .faq-section,
-  .coordinator-section,
-  .bento-section,
-  #clinic-gallery,
-  #coordinator {
+  /* ── CORE WEB VITALS: content-visibility for off-screen sections ──
+     Trimmed 2026-07-20: sections with interactive children (.gallery, .reviews,
+     .faq-section, #coordinator) are EXCLUDED — their skipped layout produced phantom
+     child rects that axe/Lighthouse read as obscured tap targets and wrong contrast
+     backgrounds. Remaining sections are covered by the curated list in the perf styles
+     (auto-sized). Keep any new content-visibility usage out of interactive sections. */
+  .guarantee-section {
     content-visibility: auto;
-    contain-intrinsic-size: 0 640px;
+    contain-intrinsic-size: auto 640px;
   }
   /* Map section — contains iframe, heavier */
   .map-section-grid {
@@ -1727,8 +1721,8 @@
     text-transform: uppercase;
     margin-bottom: 12px;
   }
-  .risks-compare-bad .risks-compare-head { color: #c05050; }
-  .risks-compare-good .risks-compare-head { color: var(--gold); }
+  .risks-compare-bad .risks-compare-head { color: #a63c3c; }
+  .risks-compare-good .risks-compare-head { color: #8a6534; }
   .risks-compare ul {
     list-style: none;
     padding: 0;
@@ -1747,7 +1741,7 @@
     content: '✕';
     position: absolute;
     left: 0;
-    color: #c05050;
+    color: #a63c3c;
     font-size: 10px;
     top: 5px;
   }
@@ -2418,7 +2412,7 @@
     font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.72);
     margin-bottom: 10px;
   }
   .savecalc-select-wrap {
@@ -2477,7 +2471,7 @@
   .sc-pill.active {
     background: rgba(196,154,108,0.15);
     border-color: var(--gold);
-    color: var(--gold);
+    color: #d4b080;
     font-weight: 600;
   }
 
@@ -2766,8 +2760,8 @@
      sections and remembers the real size after first render (no re-scroll jank). The consultation
      form (.msform-section) is intentionally excluded — it's the conversion/anchor-critical path. */
   .treatments-showcase, .implant-compare, .ba-section, .why-greenfield,
-  #clinic-gallery, .yt-testimonials, .care-journey, .bento-section,
-  .savecalc, .risks, .gallery, .reviews, .faq-section, footer {
+  #clinic-gallery, .yt-testimonials, .bento-section,
+  .savecalc, footer {
     content-visibility: auto;
     contain-intrinsic-size: auto 600px;
   }
@@ -3285,7 +3279,6 @@
     letter-spacing: 2px;
     color: var(--gold);
     margin-bottom: 10px;
-    opacity: 0.85;
   }
 
   .cj-card h3 {
@@ -3366,7 +3359,7 @@
     font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.72);
     margin-bottom: 18px;
   }
   .brand-strip-logos {
@@ -3403,7 +3396,7 @@
   .brand-strip-note {
     font-family: 'DM Sans', 'DM Sans Fallback', sans-serif;
     font-size: 11px;
-    color: rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.72);
     letter-spacing: 0.3px;
   }
   @media (max-width: 600px) {
@@ -3491,7 +3484,6 @@
     color: var(--gold);
     letter-spacing: 0.3px;
     margin-bottom: 0;
-    opacity: 0.9;
   }
   .tsc-btn {
     display: inline-block;
@@ -3625,7 +3617,7 @@
   }
   .ic-tagline {
     font-size: 12px;
-    color: #888;
+    color: #6b6b6b;
     margin-bottom: 24px;
     line-height: 1.4;
     text-align: center;
@@ -3637,7 +3629,7 @@
   }
   .ic-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
   .ic-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-  .ic-row-label { font-size: 12px; color: #777; }
+  .ic-row-label { font-size: 12px; color: #6b6b6b; }
   .ic-row-val {
     font-size: 13px;
     font-weight: 700;
@@ -3652,7 +3644,7 @@
     color: var(--gold);
     margin-bottom: 4px;
   }
-  .ic-price-note { font-size: 11px; color: #aaa; margin-bottom: 24px; }
+  .ic-price-note { font-size: 11px; color: #6b6b6b; margin-bottom: 24px; }
   .ic-cta {
     display: block;
     background: var(--gold);
@@ -3987,7 +3979,7 @@
     left: 50%;
     transform: translateX(-50%);
     background: var(--gold);
-    color: #fff;
+    color: #0c3535;
     font-family: 'DM Sans', 'DM Sans Fallback', sans-serif;
     font-size: 10px;
     font-weight: 700;
@@ -4139,6 +4131,33 @@
   }
   .hero-eyebrow { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
 }
+
+/* ── A11Y CONTRAST (WCAG AA) ──
+   #8a6534 = accessible gold for LIGHT backgrounds only (4.68:1 on #f2f8f7); the standard
+   --gold #c49a6c stays for dark backgrounds where it passes (5.1:1 on navy). */
+.implant-compare-header .section-label,
+.implant-compare-header h2 em,
+.coordinator-text .section-label,
+.faq-inner h2 em,
+.footer-hours strong,
+.ic-price, .ic-price .gp,
+.ic-cta--outline { color: #8a6534 !important; }
+/* light-bg gold: faq + coordinator section labels/links */
+.faq-section .section-label,
+.coordinator-label,
+.coordinator-text p a { color: #8a6534 !important; }
+/* the featured (dark navy) implant card keeps the LIGHT gold + light grays */
+.ic-card--highlight .ic-price,
+.ic-card--highlight .ic-price .gp { color: #c49a6c !important; }
+.ic-card--highlight .ic-price-note,
+.ic-card--highlight .ic-tagline,
+.ic-card--highlight .ic-row-label { color: rgba(255,255,255,0.75) !important; }
+/* review card source line: --text-muted (7a9090) fails on white */
+.review-source { color: #5f7373 !important; }
+/* Journey bullets: was rgba(12,53,53,0.5) — too faint everywhere it renders */
+.cj-bullets li { color: rgba(12,53,53,0.78) !important; }
+/* Reviews text link: 20px tall — give it a real tap target */
+.reviews p > a { display: inline-block; padding: 12px 4px; }
 </style>
 <style>
 /* ── CHAT WIDGET ── */
@@ -4464,7 +4483,7 @@ section {
 .coordinator-text p{font-size:0.975rem;color:#444;line-height:1.8;margin-bottom:0.85rem;}
 .coordinator-actions{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem;}
 @media(max-width:720px){.coordinator-actions{justify-content:center;}}
-.coordinator-wa{display:inline-flex;align-items:center;gap:0.5rem;background:#25D366;color:#fff;padding:0.7rem 1.4rem;border-radius:4px;font-size:0.875rem;font-weight:500;text-decoration:none;}
+.coordinator-wa{display:inline-flex;align-items:center;gap:0.5rem;background:#0e7a41;color:#fff;padding:0.7rem 1.4rem;border-radius:4px;font-size:0.875rem;font-weight:500;text-decoration:none;}
 .coordinator-email{display:inline-flex;align-items:center;background:var(--navy);color:#fff;padding:0.7rem 1.4rem;border-radius:4px;font-size:0.875rem;font-weight:500;text-decoration:none;}
 
 /* ── GUARANTEE ── */
@@ -5286,7 +5305,7 @@ h1, h2, h3 {
   .tsc-price {
     font-size: 11px !important;
     margin-bottom: 4px !important;
-    color: rgba(196,154,108,0.85) !important;
+    color: #c49a6c !important;
   }
 
   /* Button: always visible, full width */
@@ -5874,26 +5893,26 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
 <!-- COUNTRY SOCIAL PROOF BAR -->
 <div style="background:#f7faf9;border-top:1px solid #e8f0ef;border-bottom:1px solid #e8f0ef;padding:14px 5%;overflow:hidden;">
   <div style="max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-right:28px;white-space:nowrap;">Patients this year from:</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6b6f6f;margin-right:28px;white-space:nowrap;">Patients this year from:</div>
     <div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;align-items:center;">
       <div style="display:flex;align-items:center;gap:7px;padding:6px 0;">
         <span style="font-size:20px;">🇦🇺</span>
-        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">347</div><div style="font-size:10px;color:#999;font-weight:500;">Australians</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">347</div><div style="font-size:10px;color:#6b6f6f;font-weight:500;">Australians</div></div>
       </div>
       <div style="width:1px;height:28px;background:#ddd;"></div>
       <div style="display:flex;align-items:center;gap:7px;padding:6px 0;">
         <span style="font-size:20px;">🇬🇧</span>
-        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">189</div><div style="font-size:10px;color:#999;font-weight:500;">from UK</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">189</div><div style="font-size:10px;color:#6b6f6f;font-weight:500;">from UK</div></div>
       </div>
       <div style="width:1px;height:28px;background:#ddd;"></div>
       <div style="display:flex;align-items:center;gap:7px;padding:6px 0;">
         <span style="font-size:20px;">🇺🇸</span>
-        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">124</div><div style="font-size:10px;color:#999;font-weight:500;">Americans</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">124</div><div style="font-size:10px;color:#6b6f6f;font-weight:500;">Americans</div></div>
       </div>
       <div style="width:1px;height:28px;background:#ddd;"></div>
       <div style="display:flex;align-items:center;gap:7px;padding:6px 0;">
         <span style="font-size:20px;">🌏</span>
-        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">25+</div><div style="font-size:10px;color:#999;font-weight:500;">Countries</div></div>
+        <div><div style="font-size:13px;font-weight:700;color:#0c3535;line-height:1.1;">25+</div><div style="font-size:10px;color:#6b6f6f;font-weight:500;">Countries</div></div>
       </div>
       <div style="width:1px;height:28px;background:#ddd;display:none;" class="hide-mobile"></div>
       <a href="#consultation" style="display:inline-block;background:#0c3535;color:#fff;padding:9px 20px;border-radius:100px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap;letter-spacing:0.3px;margin-left:8px;">Join Them →</a>
@@ -6505,7 +6524,7 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
     <a href="https://www.youtube.com/playlist?list=PLYQFYymfUX_hB2MqATz1mjqtgXCaxy2aD" target="_blank" rel="noopener noreferrer" style="color:var(--gold);font-family:'DM Sans','DM Sans Fallback',sans-serif;font-size:0.95rem;letter-spacing:0.04em;text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:2px;" data-clinic="youtubeHref">View more patient stories on YouTube</a>
   </div>
   <div style="text-align:center;margin-top:32px;padding-bottom:60px;">
-    <a href="#consultation" style="display:inline-block;background:var(--gold);color:#fff;font-family:'DM Sans','DM Sans Fallback',sans-serif;font-size:15px;font-weight:600;padding:16px 36px;border-radius:100px;text-decoration:none;letter-spacing:0.3px;">Find Out If You're a Candidate — Free →</a>
+    <a href="#consultation" style="display:inline-block;background:var(--gold);color:#0c3535;font-family:'DM Sans','DM Sans Fallback',sans-serif;font-size:15px;font-weight:600;padding:16px 36px;border-radius:100px;text-decoration:none;letter-spacing:0.3px;">Find Out If You're a Candidate — Free →</a>
     <p style="font-family:'DM Sans','DM Sans Fallback',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);margin-top:12px;">No commitment · Specialist review · Response within 24 hours</p>
   </div>
 </section>
@@ -7279,7 +7298,7 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
         <div style="font-size:12px;color:#555;margin-top:2px;">
           <span style="color:#FBBC05;letter-spacing:1px;">★★★★★</span>
           <span style="margin-left:6px;font-weight:600;color:#333;">4.9</span>
-          <span style="color:#888;margin-left:4px;">· Verified Google Reviews</span>
+          <span style="color:#6b6b6b;margin-left:4px;">· Verified Google Reviews</span>
         </div>
       </div>
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -7393,7 +7412,7 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
 
     </div>
     <div style="text-align:center;margin-top:36px;">
-      <a href="#consultation" style="display:inline-block;background:var(--gold);color:#fff;font-family:'DM Sans','DM Sans Fallback',sans-serif;font-size:14px;font-weight:600;padding:14px 32px;border-radius:100px;text-decoration:none;letter-spacing:0.3px;">Have More Questions? Send Them Free →</a>
+      <a href="#consultation" style="display:inline-block;background:var(--gold);color:#0c3535;font-family:'DM Sans','DM Sans Fallback',sans-serif;font-size:14px;font-weight:600;padding:14px 32px;border-radius:100px;text-decoration:none;letter-spacing:0.3px;">Have More Questions? Send Them Free →</a>
     </div>
   </div>
 </section>
@@ -7532,7 +7551,7 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
         </div>
       </div>
       <a href="https://www.google.com/search?q=greenfield+dental+hanoi#lrd=0x3135ab61d71125a3:0x7bd424c8155a3052,1,,,," target="_blank" rel="noopener"
-         style="display:inline-flex;align-items:center;gap:8px;background:#c49a6c;color:#fff;text-decoration:none;padding:13px 24px;border-radius:8px;font-size:14px;font-weight:700;width:fit-content;transition:background .2s;">
+         style="display:inline-flex;align-items:center;gap:8px;background:#c49a6c;color:#0c3535;text-decoration:none;padding:13px 24px;border-radius:8px;font-size:14px;font-weight:700;width:fit-content;transition:background .2s;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Open in Google Maps
       </a>
@@ -7588,7 +7607,7 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
   </div>
   <div class="footer-bottom">
     <span>© 2026 <a href="https://nhakhoagreenfield.com" style="color:rgba(255,255,255,0.6);text-decoration:underline;">Greenfield Dental</a>™ — Hanoi, Vietnam. All rights reserved.</span>
-    <p class="text-xs" style="opacity:0.5;font-size:11px;margin-top:6px;">Last updated: March 2026</p>
+    <p class="text-xs" style="color:#5f7373;font-size:11px;margin-top:6px;">Last updated: March 2026</p>
   </div>
 </footer>
 
@@ -7932,7 +7951,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.yt-card').forEach(function(card, i) {
     card.setAttribute('role', 'button');
     card.setAttribute('tabindex', '0');
-    card.setAttribute('aria-label', 'Watch patient testimonial video ' + (i + 1));
+    card.setAttribute('aria-label', 'Watch video ' + (i + 1) + ': ' + card.textContent.replace(/\s+/g, ' ').trim());
     card.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
