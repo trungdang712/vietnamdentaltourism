@@ -36,25 +36,31 @@
   }
 </script>
 
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-11508258289"></script>
+<!-- Google Ads (gtag.js) + Facebook Pixel — stubs run immediately and QUEUE all calls;
+     the heavy libraries load on first interaction / after 3.5s so they don't compete with
+     the critical render. Conversions fire on form submit (always post-interaction), so the
+     libraries are always loaded before any conversion/lead event runs. -->
 <script>
+  // gtag stub — queues to dataLayer until gtag.js loads
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'AW-11508258289');
-</script>
 
-<!-- Facebook Pixel -->
-<script>
-!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
-n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
-document,'script','https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '26443098325275263');
-fbq('track', 'PageView');
+  // fbq stub — queues until fbevents.js loads (library injection deferred, unlike the default snippet)
+  !function(f,b,e,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+  n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window,document);
+  fbq('init', '26443098325275263');
+  fbq('track', 'PageView');
+
+  // Defer the actual libraries off the critical path
+  (function(){var loaded=false;function loadTracking(){if(loaded)return;loaded=true;
+    var g=document.createElement('script');g.async=true;g.src='https://www.googletagmanager.com/gtag/js?id=AW-11508258289';document.head.appendChild(g);
+    var fb=document.createElement('script');fb.async=true;fb.src='https://connect.facebook.net/en_US/fbevents.js';document.head.appendChild(fb);
+  }
+  ['click','touchstart','scroll','keydown','mousemove'].forEach(function(ev){window.addEventListener(ev,loadTracking,{once:true,passive:true});});
+  setTimeout(loadTracking,3500);})();
 </script>
 <meta property="og:title" content="Dental Implants Vietnam 2026 | All-on-4 · All-on-6 | Greenfield Dental Hanoi">
 <meta property="og:description" content="Save 60–80% on dental implants, All-on-4 and All-on-6 full arch in Hanoi Vietnam. Straumann, Neodent & Dentium. ISO-certified clinic, 1,000+ international patients. Free quote in 24hrs.">
@@ -2678,7 +2684,8 @@ fbq('track', 'PageView');
     background:
       linear-gradient(-50deg, #09545a 0%, #0f7272 25%, #0a5858 50%, #126060 75%, #094848 100%) !important;
     background-size: 400% 400% !important;
-    animation: heroMesh 16s ease infinite !important;
+    background-position: 30% 50% !important;
+    /* animation removed — was a continuous full-hero repaint that inflated main-thread/LCP */
   }
   .hero::before {
     background:
@@ -2689,7 +2696,7 @@ fbq('track', 'PageView');
     width: 360px; height: 360px;
     background: radial-gradient(circle, rgba(196,154,108,0.1) 0%, transparent 70%) !important;
     filter: blur(50px) !important;
-    animation: floatUp 10s ease-in-out infinite !important;
+    /* animation removed — floating blurred blob repainted every frame */
   }
   .hero h1 {
     /* Opaque fill (was a transparent gradient-clip). Transparent-fill text has no ink of
@@ -2994,7 +3001,7 @@ fbq('track', 'PageView');
   .stats-strip {
     background: linear-gradient(90deg, #b8864e 0%, #c49a6c 25%, #d4aa7a 50%, #c49a6c 75%, #b8864e 100%) !important;
     background-size: 200% auto !important;
-    animation: shimmerGold 7s linear infinite !important;
+    /* shimmerGold animation removed — continuous text repaint */
     box-shadow: 0 -2px 20px rgba(196,154,108,0.2), 0 4px 24px rgba(196,154,108,0.2) !important;
     padding: 44px 5% !important;
   }
@@ -9168,8 +9175,6 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
   });
 })();
 </script>
-<script src="detect-visitor.js?v=1" defer></script>
-
 <script src="clinic-info-sync.js" defer></script>
 </body>
 </html>
