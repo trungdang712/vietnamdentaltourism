@@ -168,6 +168,12 @@ fbq('track', 'PageView');
 <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Preload the hero heading font (Playfair Display 700, latin subset) so the LCP <h1>
+     gets its real font in parallel instead of waiting for the async font CSS to load and
+     then request it — removes the double round-trip that made LCP land as late as 7s and
+     intermittently register as NO_LCP. Refresh this URL if Google rotates the font file
+     (a stale preload is harmless — the font still loads via the CSS below). -->
+<link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgA.woff2">
 <!-- Non-blocking font load — eliminates render-blocking resource (LCP fix) -->
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap"></noscript>
@@ -2686,10 +2692,12 @@ fbq('track', 'PageView');
     animation: floatUp 10s ease-in-out infinite !important;
   }
   .hero h1 {
-    background: linear-gradient(135deg, #ffffff 0%, #f4ece0 55%, #c49a6c 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    /* Opaque fill (was a transparent gradient-clip). Transparent-fill text has no ink of
+       its own, which made this — the largest above-the-fold element — an unreliable LCP
+       candidate. Solid warm-white here + the inline gold <em> on line 2 keeps the original
+       two-tone look while guaranteeing the heading registers as the LCP on first paint. */
+    color: #fdf6ec !important;
+    -webkit-text-fill-color: currentColor;
     letter-spacing: -2px !important;
     line-height: 1.06 !important;
   }
@@ -2721,6 +2729,25 @@ fbq('track', 'PageView');
     box-shadow: 0 10px 36px rgba(196,154,108,0.45) !important;
     transform: translateY(-2px) !important;
   }
+
+  /* ── RENDER PERFORMANCE ──
+     Skip layout/paint of below-the-fold sections until they're scrolled near the viewport,
+     so the browser reaches the hero (the LCP) sooner instead of laying out the entire ~390KB
+     page first. `contain-intrinsic-size: auto <h>` supplies a placeholder height for unrendered
+     sections and remembers the real size after first render (no re-scroll jank). The consultation
+     form (.msform-section) is intentionally excluded — it's the conversion/anchor-critical path. */
+  .treatments-showcase, .implant-compare, .ba-section, .why-greenfield,
+  #clinic-gallery, .yt-testimonials, .care-journey, .bento-section,
+  .savecalc, .risks, .gallery, .reviews, .faq-section, footer {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+  /* Anchor targets land clear of the sticky nav (also fixes offset for the CV sections above). */
+  #treatments, #implant-options, #transformations, #why-greenfield, #clinic-gallery,
+  #testimonials, #journey, #consultation, #faq {
+    scroll-margin-top: 84px;
+  }
+
   /* ── PREMIUM NAV ── */
   nav {
     background: rgba(10,72,72,0.94) !important;
@@ -3836,11 +3863,17 @@ fbq('track', 'PageView');
   .ba-header h2 em { color: var(--gold); font-style: italic; }
   .ba-header .lead { color: rgba(255,255,255,0.68); font-size: 1.05rem; line-height: 1.7; }
   .ba-pills {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
     justify-content: center;
+    justify-items: center;
     gap: 10px;
-    flex-wrap: wrap;
     margin-top: 28px;
+  }
+  /* 4th pill ("Save …") sits in the centre column, directly under the middle pill */
+  .ba-pills > .ba-pill:nth-child(4) { grid-column: 2; }
+  @media (max-width: 700px) {
+    .ba-pills { display: flex; flex-wrap: wrap; }
   }
   .ba-pill {
     display: inline-flex;
@@ -4057,6 +4090,7 @@ fbq('track', 'PageView');
     <div class="hero-cta-row">
       <a href="#consultation" class="btn-hero-primary" data-i18n="hero_cta_primary">Get My Free Quote →</a>
     </div>
+    <div class="hero-trust-line">
     <div class="hero-trust-pills" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;align-items:center;">
       <a href="https://www.google.com/search?q=greenfield+dental+hanoi#lrd=0x3135ab61d71125a3:0x7bd424c8155a3052,1,,,," target="_blank" rel="noopener" style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:8px 16px;text-decoration:none;">
         <span style="color:#FBBC05;font-size:13px;letter-spacing:1px;">★★★★★</span>
@@ -4068,7 +4102,7 @@ fbq('track', 'PageView');
       </div>
       <div style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:100px;padding:8px 16px;">
         <span style="font-size:13px;">🛡️</span>
-        <span style="font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;">97% Success Rate</span>
+        <span style="font-size:12px;color:rgba(255,255,255,0.75);font-weight:600;">97% Success</span>
       </div>
     </div>
 
@@ -4085,7 +4119,7 @@ fbq('track', 'PageView');
           <text x="20" y="29.5" text-anchor="middle" font-family="Arial,sans-serif" font-size="3.8" fill="rgba(255,255,255,0.55)">2015</text>
         </svg>
         <div class="iso-badge-text">
-          <strong>ISO 9001:2015</strong>
+          <strong>ISO 9001</strong>
           <span>Quality Management</span>
         </div>
       </div>
@@ -4106,6 +4140,7 @@ fbq('track', 'PageView');
       </div>
 
     </div>
+    </div><!-- /.hero-trust-line -->
 
   </div>
 
@@ -5092,7 +5127,7 @@ fbq('track', 'PageView');
     <div class="stat-label">Free Medical Consultations</div>
   </div>
   <div class="stat-item">
-    <div class="stat-num" data-target="600" data-suffix="K+">0</div>
+    <div class="stat-num" data-target="50" data-suffix="+">0</div>
     <div class="stat-label">Years of Medical Experience</div>
   </div>
   <div class="stat-item">
@@ -5793,7 +5828,7 @@ fbq('track', 'PageView');
   <p data-i18n="cta_sub">Over 1,000 patients from 25+ countries made the journey — and saved an average of <strong style="color:#fff;">$15,000</strong>. Your written quote, your treatment plan, and your warranty are all confirmed before you book a single flight.</p>
   <blockquote style="font-style:italic;color:rgba(255,255,255,0.55);font-size:14px;max-width:520px;margin:0 auto 28px;line-height:1.75;border-left:2px solid rgba(196,154,108,0.4);padding-left:16px;text-align:left;">"I was nervous. I almost didn't go. Best decision I've ever made — I saved $22,000 and came home with a smile I'd given up on."<br><span style="font-style:normal;font-size:12px;font-weight:600;color:rgba(255,255,255,0.4);letter-spacing:0.5px;">— Michelle K., Brisbane, All-on-4</span></blockquote>
   <a href="#consultation" class="btn-dark" data-i18n="cta_btn">Get My Free Assessment →</a>
-  <p style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.3px;">No credit card. No obligation. Clinical team typically responds within 2 hours.</p>
+  <p class="cta-noline" style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:0.3px;">No credit card. No obligation. Clinical team typically responds within 2 hours.</p>
 </div>
 
 </main>
@@ -5804,10 +5839,10 @@ fbq('track', 'PageView');
   <div style="display:grid;grid-template-columns:1fr 420px;max-width:1200px;margin:0 auto;min-height:400px;align-items:stretch;" class="map-section-grid">
 
     <!-- Map embed -->
-    <div style="min-height:400px;overflow:hidden;">
+    <div style="position:relative;min-height:400px;overflow:hidden;">
       <iframe
         src="https://www.google.com/maps?q=95+Trung+Hoa,+Cau+Giay,+Hanoi,+Vietnam&output=embed&hl=en&z=16"
-        width="100%" height="100%" style="border:0;display:block;min-height:400px;"
+        width="100%" height="100%" style="border:0;display:block;position:absolute;inset:0;width:100%;height:100%;"
         allowfullscreen="" loading="lazy"
         referrerpolicy="no-referrer-when-downgrade"
         title="Greenfield Dental location — 95 Trung Hoa, Cau Giay, Hanoi">
@@ -5853,6 +5888,48 @@ fbq('track', 'PageView');
   .map-section-grid > div:first-child { min-height: 280px !important; }
   .map-section-grid > div:last-child { padding: 36px 24px !important; }
 }
+</style>
+
+<style>
+/* ===== Layout fixes (2026-07-19) ===== */
+
+/* #2 — Group nav links beside WhatsApp + Free Quote on the right; kills the big gap between them */
+.nav-links { margin-left: auto; }
+@media (min-width: 861px) {
+  nav { justify-content: flex-start; gap: 14px; }
+}
+
+/* #3 — Trust pills + ISO badges share one line */
+.hero-trust-line { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 16px; margin-top: 28px; }
+.hero-trust-line > .hero-trust-pills { margin-top: 0 !important; }
+.hero-trust-line > .iso-badges { margin-top: 0 !important; }
+
+/* #6 — "Included at no extra cost" items on a single row (wide screens; wraps below 1280px).
+   Descendant selectors (.inclusions-strip ...) to outrank the later base .inclusions-grid rule. */
+@media (min-width: 1280px) {
+  .inclusions-strip .inclusions-grid { flex-wrap: nowrap; gap: 10px 18px; }
+  .inclusions-strip .inclusion-item { white-space: nowrap; font-size: 12px; }
+  .inclusions-strip .inclusion-item svg { width: 18px; height: 18px; }
+}
+
+/* #8 — CTA fine print on one line (wraps again on small screens) */
+.cta-noline { max-width: none !important; white-space: nowrap; }
+@media (max-width: 640px) { .cta-noline { white-space: normal; } }
+
+/* #3b — Compact the 5 trust items (pills + ISO) into uniform small pills so they
+   share one line inside the ~640px hero column. ISO seal shrinks to an icon and the
+   subtitle is dropped, turning each badge into a pill that matches the trust pills. */
+.hero-trust-line { gap: 6px !important; }
+.hero-trust-line .hero-trust-pills { gap: 6px !important; margin-top: 0 !important; }
+.hero-trust-line .hero-trust-pills > * { padding: 6px 11px !important; }
+.hero-trust-line .hero-trust-pills > * > span { font-size: 11px !important; }
+.hero-trust-line .iso-badges { gap: 6px !important; margin-top: 0 !important; }
+.hero-trust-line .iso-badge {
+  gap: 5px !important; padding: 6px 11px !important; border-radius: 100px !important;
+}
+.hero-trust-line .iso-badge-seal { width: 16px !important; height: 16px !important; }
+.hero-trust-line .iso-badge-text strong { font-size: 11px !important; letter-spacing: 0.2px !important; }
+.hero-trust-line .iso-badge-text span { display: none !important; }
 </style>
 
 <footer role="contentinfo" aria-label="Site footer">
@@ -7473,7 +7550,7 @@ section {
 .guarantee-sub{color:rgba(255,255,255,0.6);font-size:0.975rem;max-width:500px;margin:0 auto;}
 .guarantee-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
 .guarantee-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:1.75rem;}
-.guarantee-icon{margin-bottom:1rem;}
+.guarantee-icon{margin-bottom:1rem;display:flex;justify-content:center;}
 .guarantee-card h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:#fff;margin-bottom:0.6rem;}
 .guarantee-card p{font-size:0.875rem;color:rgba(255,255,255,0.62);line-height:1.75;}
 
