@@ -184,8 +184,8 @@
      (a stale preload is harmless — the font still loads via the CSS below). -->
 <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/playfairdisplay/v40/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgA.woff2">
 <!-- Non-blocking font load — eliminates render-blocking resource (LCP fix) -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=optional" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=optional"></noscript>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -5945,6 +5945,13 @@
 .coordinator-email { min-height: 48px; box-sizing: border-box; }
 .faq-q { min-height: 48px; }
 .ba-cta .btn-primary { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
+
+/* CLS: pin hero pill line-heights in px so a webfont swap can't change their box height
+   and reflow the hero (was the layout-shift culprit that intermittently failed the
+   Agentic Browsing CLS check under PSI's throttle). Uppercase/single-line, so safe. */
+.hero-eyebrow { line-height: 18px !important; }
+.hero-urgency { line-height: 16px !important; }
+.hfc-title { min-height: 1.3em; }
 </style>
 
 <footer role="contentinfo" aria-label="Site footer">
@@ -8885,7 +8892,7 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
   /* ── Load Heebo font (Hebrew-optimised) ── */
   var fontLink = document.createElement('link');
   fontLink.rel = 'stylesheet';
-  fontLink.href = 'https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap';
+  fontLink.href = 'https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=optional';
   document.head.appendChild(fontLink);
 
   /* ── Apply class + direction immediately ── */
