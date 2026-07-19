@@ -1218,7 +1218,7 @@
   .btn-nav {
     background: var(--gold);
     border: 1px solid var(--gold);
-    color: #fff;
+    color: #0c3535;
     padding: 10px 22px;
     border-radius: 100px;
     font-weight: 600;
@@ -2188,7 +2188,7 @@
     line-height: 1.8;
   }
   .footer-badge strong { color: var(--gold); display: block; margin-bottom: 4px; }
-  footer h4 {
+  footer h3 {
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 1.5px;
@@ -2988,7 +2988,7 @@
     background: linear-gradient(160deg, #093535 0%, #0c4848 40%, #093838 100%) !important;
     padding: 70px 5% 32px !important;
   }
-  footer h4 { color: #fff !important; letter-spacing: 1.2px !important; }
+  footer h3 { color: #fff !important; letter-spacing: 1.2px !important; }
   footer ul li a { color: rgba(255,255,255,0.5) !important; }
   footer ul li a:hover { color: var(--gold) !important; }
   .footer-brand p { color: rgba(255,255,255,0.55) !important; }
@@ -5046,10 +5046,10 @@
     <!-- Country + Treatment selector -->
     <div class="savecalc-controls">
       <div class="savecalc-field">
-        <label>Your Country</label>
+        <label for="calcCountry">Your Country</label>
         <div class="savecalc-select-wrap">
           <img loading="lazy" id="calcFlagImg" src="https://flagcdn.com/w160/au.png" alt="" aria-hidden="true" class="calc-flag-img">
-          <select id="calcCountry" onchange="runCalc()">
+          <select id="calcCountry" onchange="runCalc()" aria-label="Your Country">
             <option value="AU">Australia</option>
             <option value="UK">United Kingdom</option>
             <option value="US">United States</option>
@@ -5066,9 +5066,9 @@
         </div>
       </div>
       <div class="savecalc-field">
-        <label>Treatment</label>
-        <div class="savecalc-select-wrap" style="opacity:0;pointer-events:none;height:0;margin:0;overflow:hidden;">
-          <select id="calcTreatment" onchange="runCalc()">
+        <label for="calcTreatment">Treatment</label>
+        <div class="savecalc-select-wrap" style="opacity:0;pointer-events:none;height:0;margin:0;overflow:hidden;" aria-hidden="true">
+          <select id="calcTreatment" onchange="runCalc()" tabindex="-1" aria-label="Treatment">
             <option value="implant">Single Dental Implant</option>
             <option value="allon4">All-on-4 Full Arch</option>
             <option value="veneers">Veneers (10 teeth)</option>
@@ -5937,6 +5937,11 @@
 .hero-trust-line .iso-badge-seal { width: 16px !important; height: 16px !important; }
 .hero-trust-line .iso-badge-text strong { font-size: 11px !important; letter-spacing: 0.2px !important; }
 .hero-trust-line .iso-badge-text span { display: none !important; }
+
+/* Accessibility: minimum touch-target size (mobile tap targets flagged by Lighthouse) */
+.coordinator-email { min-height: 48px; box-sizing: border-box; }
+.faq-q { min-height: 48px; }
+.ba-cta .btn-primary { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; }
 </style>
 
 <footer role="contentinfo" aria-label="Site footer">
@@ -5946,7 +5951,7 @@
       <p>An International Dental Clinic in Vietnam built for patients from every country. Premium care, transparent pricing, multilingual support, and aftercare you can actually rely on.</p>
     </div>
     <div>
-      <h4>Treatments</h4>
+      <h3>Treatments</h3>
       <ul>
         <li><a href="#treatments">All-on-4 / All-on-6 Full Arch</a></li>
         <li><a href="#treatments">Single &amp; Multiple Implants</a></li>
@@ -5955,7 +5960,7 @@
       </ul>
     </div>
     <div>
-      <h4>Quick Links</h4>
+      <h3>Quick Links</h3>
       <ul>
         <li><a href="#implant-options">Compare Implant Options</a></li>
         <li><a href="#why-greenfield">Why Greenfield</a></li>
@@ -5969,7 +5974,7 @@
       </ul>
     </div>
     <div>
-      <h4>Clinic Hours</h4>
+      <h3>Clinic Hours</h3>
       <p class="footer-hours"><strong>Monday – Sunday</strong><br>8:00 AM – 6:00 PM</p>
       <p class="footer-address" style="margin-top:20px;" data-clinic="address">95 Trung Hoa St, Cau Giay, Hanoi, Vietnam</p>
       <p class="footer-address" style="margin-top:8px;"><a href="tel:+84906621988" style="color:rgba(255,255,255,0.78);text-decoration:none;" data-clinic="phoneHref"><span data-clinic="phone">+84 906 621 988</span></a></p>
@@ -7935,7 +7940,7 @@ footer ul li a:hover { text-decoration: underline; }
 @media (max-width: 900px) {
   .footer-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
   footer { padding: 60px 5% 40px !important; }
-  footer h4 { font-size: 15px !important; margin-bottom: 14px !important; }
+  footer h3 { font-size: 15px !important; margin-bottom: 14px !important; }
   footer ul li { margin-bottom: 10px !important; }
   footer ul li a { font-size: 14px !important; }
   .footer-brand p { font-size: 14px !important; }
