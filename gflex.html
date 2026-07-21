@@ -95,8 +95,9 @@ input,textarea,select{font-family:inherit;font-size:inherit;}
   border-bottom:1px solid transparent;
 }
 #nav.scrolled{background:rgba(247,247,245,.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-color:var(--border-lt);box-shadow:0 1px 0 rgba(8,35,24,.04);}
-.n-logo{font-size:17px;font-weight:800;letter-spacing:-.03em;color:var(--ink);}
+.n-logo{display:flex;align-items:center;gap:8px;font-size:17px;font-weight:800;letter-spacing:-.03em;color:var(--ink);}
 .n-logo .gp{color:var(--green);}
+.n-logo-img{height:44px;width:auto;display:block;}
 .n-links{display:flex;gap:36px;list-style:none;position:absolute;left:50%;transform:translateX(-50%);}
 .n-links a{font-size:13px;color:rgba(8,35,24,.55);letter-spacing:-.01em;transition:color .2s;}
 .n-links a:hover{color:var(--ink);}
@@ -359,8 +360,9 @@ input,textarea,select{font-family:inherit;font-size:inherit;}
 /* Footer */
 footer{background:linear-gradient(-45deg,#1a1a2e,#2d1b4e,#0d2d1a,#1e1e38,#0f2d10,#2a1240);background-size:300% 300%;animation:bgGrad 7s ease infinite;border-top:none;padding:44px 56px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
 .car-dots{display:none;}
-.ft-logo{font-size:15px;font-weight:800;letter-spacing:-.02em;color:#fff;}
+.ft-logo{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:800;letter-spacing:-.02em;color:#fff;}
 .ft-logo .gp{color:var(--green);}
+.ft-logo-img{height:22px;width:auto;display:block;filter:brightness(0) invert(1);}
 .ft-links{display:flex;gap:28px;list-style:none;}
 .ft-links a{font-size:13px;color:var(--muted-d);transition:color .2s;}
 .ft-links a:hover{color:#fff;}
@@ -914,7 +916,7 @@ p{text-wrap:pretty;}
 
 <!-- NAV -->
 <nav id="nav">
-  <div class="n-logo">G<span class="gp">-Flex</span></div>
+  <div class="n-logo"><img class="n-logo-img" src="https://greenfield-clinic-files.s3.ap-southeast-1.amazonaws.com/assets/brand/Greenfield-original.svg" alt="Greenfield Dental"></div>
   <ul class="n-links">
     <li><a href="#pricing">Pricing</a></li>
     <li><a href="#process">How It Works</a></li>
@@ -1038,8 +1040,8 @@ p{text-wrap:pretty;}
         <div class="price-badge">Best Value</div>
         <div class="price-col-label">G-Flex at Greenfield</div>
         <div class="price-flag">Vietnam</div>
-        <div class="price-amount">from $1,800<span class="price-currency"> USD</span></div>
-        <div class="price-sub">Full treatment · all trays included</div>
+        <div class="price-amount">from $1,140<span class="price-currency"> USD</span></div>
+        <div class="price-sub">≈ 30,000,000 VND · full treatment · all trays included</div>
         <div class="price-saving">Save up to 70%</div>
       </div>
     </div>
@@ -1169,8 +1171,8 @@ p{text-wrap:pretty;}
         <div class="cmp-badge">Best Choice</div>
         <div class="cmp-brand-tag">Greenfield Dental Vietnam</div>
         <div class="cmp-name">G-Flex Aligners</div>
-        <div class="cmp-price">from $1,800</div>
-        <div class="cmp-price-note">USD · full treatment · all trays included</div>
+        <div class="cmp-price">from $1,140</div>
+        <div class="cmp-price-note">USD · ≈ 30,000,000 VND · full treatment · all trays included</div>
         <div class="cmp-divider"></div>
         <div class="cmp-features">
           <div class="cmp-feat">
@@ -1313,7 +1315,7 @@ p{text-wrap:pretty;}
       <div class="step reveal d2">
         <div class="step-dot"><span class="step-n">03</span></div>
         <div class="step-title">Single Trip to Vietnam</div>
-        <p class="step-desc">One visit to Ho Chi Minh City — typically 5–10 days. 3D scan, AI fitting, and your first set of trays ready before you fly home.</p>
+        <p class="step-desc">One visit to Ha Noi — typically 5–10 days. 3D scan, AI fitting, and your first set of trays ready before you fly home.</p>
         <span class="step-tag">In clinic</span>
       </div>
       <div class="step reveal d3">
@@ -1378,7 +1380,7 @@ p{text-wrap:pretty;}
       </div>
     </div>
     <div class="kit-img">
-      <img src="Downloads/design-refs/kit-optimized.jpg" alt="G-Flex complete aligner kit contents" loading="lazy" decoding="async">
+      <img src="Downloads/design-refs/kit-tnm8917.jpg" alt="G-Flex complete aligner kit contents" loading="lazy" decoding="async">
     </div>
   </div>
 </section>
@@ -1535,7 +1537,7 @@ p{text-wrap:pretty;}
 
 <!-- FOOTER -->
 <footer>
-  <div class="ft-logo">G<span class="gp">-Flex</span> by Greenfield Dental</div>
+  <div class="ft-logo"><img class="ft-logo-img" src="https://greenfield-clinic-files.s3.ap-southeast-1.amazonaws.com/assets/brand/Greenfield-original.svg" alt="Greenfield Dental">G<span class="gp">-Flex</span> by Greenfield Dental</div>
   <ul class="ft-links">
     <li><a href="#">Instagram</a></li>
     <li><a href="#">Privacy Policy</a></li>
