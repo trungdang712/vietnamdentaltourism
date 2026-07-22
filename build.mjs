@@ -51,8 +51,13 @@ for (const j of jobs) {
 writeFileSync(path.join(DIST, 'index.html'), html);
 
 // ── 2. Copy everything else verbatim ──
+// gflex.html / lp-implants.html / Downloads: pre-migration orphans that were
+// being SERVED — gflex.html posts to a DEAD endpoint and silently ate leads.
+// Excluded 2026-07-22 so they 404; the campaigns live on their own domains
+// (clearalignersvietnam.com / dentalimplantsinvietnam.com).
 const EXCLUDE = new Set(['dist', 'node_modules', '.git', '.vercel', 'index.html', 'build.mjs',
-  'package.json', 'package-lock.json', 'vercel.json', '.gitignore', '.DS_Store']);
+  'package.json', 'package-lock.json', 'vercel.json', '.gitignore', '.DS_Store',
+  'gflex.html', 'lp-implants.html', 'Downloads']);
 for (const entry of readdirSync(ROOT)) {
   if (EXCLUDE.has(entry) || entry.endsWith('.md')) continue;
   cpSync(path.join(ROOT, entry), path.join(DIST, entry), { recursive: true });

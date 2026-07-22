@@ -7614,6 +7614,9 @@ html.lang-he .risks-compare-col ul { padding-right: 1rem !important; padding-lef
 <!-- FLOATING STICKY CTA -->
 
 <script src="detect-visitor.js?v=2" defer></script>
+<!-- Shared Greenfield lead-capture runtime (5-layer safety net) — one copy
+     for all landing pages. Source: quotation-v2 repo, public/lead-capture/v1.js. -->
+<script src="https://lead.greenfield.clinic/lead-capture/v1.js" defer></script>
 <script>
 // ── Counter animation ──
 function animateCounters() {
@@ -7689,14 +7692,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ══════════════════════════════════════════════════════════════
-// LEAD CAPTURE — 5-Layer Protection Pattern
+// LEAD CAPTURE — via the shared GFLeads runtime (lead-capture/v1.js)
+// All 5 safety-net layers (API POST to lead.greenfield.clinic, sheet log,
+// failure email, localStorage queue — the old 'leadQueue' key migrates to
+// gfq_v1 automatically — and WhatsApp fallback) plus visitorData/UTM
+// enrichment and 429-auto-retry live in the shared script. This page keeps
+// its payload builders, utmData spreads and conversion tags.
 // ══════════════════════════════════════════════════════════════
 
-var API_BASE = 'https://quotation-indol.vercel.app/api/public/lead';
-var SHEET_WEBHOOK = 'https://script.google.com/macros/s/AKfycbyZuUTZJ82bNgLtuze0B6sro0VKUWkvCUcACZKvPI7soGY5-gP8qvbrTMVr5eZrVmiuxA/exec';
-var WHATSAPP_NUMBER = '84906621988';
-
-// UTM capture on page load
+// UTM capture on page load (payload builders spread this; the runtime would
+// fill the same values, but keeping it local avoids touching 4 call sites)
 var utmData = (function() {
   var p = new URLSearchParams(window.location.search);
   return {
@@ -7708,151 +7713,40 @@ var utmData = (function() {
   };
 })();
 
-// Layer 2: Google Sheet backup (fires on EVERY submission)
-// apiStatus: true -> 'success', false -> 'failed' (triggers the ⚠ alert email
-// in the Apps Script), or a string for intermediate states like
-// 'rate-limited (auto-retry)' which records the row without the alert.
-function sendToSheet(leadData, formName, apiStatus) {
-  if (!SHEET_WEBHOOK) return;
-  fetch(SHEET_WEBHOOK, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      name: leadData.name || '', phone: leadData.phone || '',
-      email: leadData.email || '', treatment: leadData.treatment || '',
-      timeline: leadData.timeline || '', country: leadData.country || '',
-      contactPreference: leadData.contactPreference || '',
-      notes: leadData.notes || '', form: formName,
-      apiStatus: apiStatus === true ? 'success' : apiStatus === false ? 'failed' : String(apiStatus),
-      utmSource: leadData.utmSource || '', utmMedium: leadData.utmMedium || '',
-      utmCampaign: leadData.utmCampaign || '',
-    }),
-    mode: 'no-cors',
-  }).catch(function(){});
-}
-
-// Layer 4: localStorage queue for retry
-function queueLead(leadData) {
-  try {
-    var queue = JSON.parse(localStorage.getItem('leadQueue') || '[]');
-    var stamped = Object.assign({}, leadData, { queuedAt: new Date().toISOString() });
-    queue.push(stamped);
-    localStorage.setItem('leadQueue', JSON.stringify(queue));
-    return stamped.queuedAt;
-  } catch(e) { return null; }
-}
-
-function dequeueLead(queuedAt) {
-  if (!queuedAt) return;
-  try {
-    var queue = JSON.parse(localStorage.getItem('leadQueue') || '[]');
-    localStorage.setItem('leadQueue',
-      JSON.stringify(queue.filter(function(l) { return l.queuedAt !== queuedAt; })));
-  } catch(e) {}
-}
-
-function flushLeadQueue() {
-  try {
-    var queue = JSON.parse(localStorage.getItem('leadQueue') || '[]');
-    if (!queue.length) return;
-    var fresh = queue.filter(function(l) {
-      return (Date.now() - new Date(l.queuedAt).getTime()) < 7 * 24 * 60 * 60 * 1000;
-    });
-    fresh.forEach(function(lead) {
-      fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(lead),
-      }).then(function(res) {
-        if (res.ok) {
-          var remaining = JSON.parse(localStorage.getItem('leadQueue') || '[]');
-          localStorage.setItem('leadQueue',
-            JSON.stringify(remaining.filter(function(l) { return l.queuedAt !== lead.queuedAt; })));
-        }
-      }).catch(function(){});
-    });
-  } catch(e) {}
-}
-document.addEventListener('DOMContentLoaded', flushLeadQueue);
-
-// Layer 5: WhatsApp fallback
-function whatsappFallback(leadData) {
-  var msg = encodeURIComponent(
-    'I\'d like a consultation:\nName: ' + (leadData.name || '') +
-    '\nPhone: ' + (leadData.phone || '') +
-    '\nEmail: ' + (leadData.email || 'N/A') +
-    '\nTreatment: ' + (leadData.treatment || 'N/A')
-  );
-  window.open('https://wa.me/' + WHATSAPP_NUMBER + '?text=' + msg);
-}
-
-// Conversion tracking (fires on every form submit)
-function fireConversions(formName, apiOk) {
+// Conversion tags (fires on every form submit). The uniform dataLayer
+// form_submit push (with api_success) now comes from GFLeads.submit.
+function fireConversions(formName) {
   try { gtag('event', 'conversion', { send_to: 'AW-11508258289/ak2wCKyC3PwZEPGryO8q' }); } catch(e) {}
   try { gtag('event', 'generate_lead', { currency: 'AUD', value: 1.0 }); } catch(e) {}
   try { fbq('track', 'Lead', { content_name: formName }); } catch(e) {}
-  window.dataLayer = window.dataLayer || [];
-  window.dataLayer.push({ event: 'form_submit', formName: formName, api_success: apiOk });
 }
 
-// Core submission handler — 5-layer pattern
+// Core submission handler — same signature as before, callers untouched.
 async function submitLeadData(leadData, formName) {
-  // Enrich with visitor geo-detection data
-  var vd = window.visitorData || {};
-  if (vd.country) leadData.country = leadData.country || vd.country;
-  if (vd.countryCode) leadData.countryCode = leadData.countryCode || vd.countryCode;
-  if (vd.preferredLanguage) leadData.preferredLanguage = leadData.preferredLanguage || vd.preferredLanguage;
-
-  // Strip empty email — DTO @IsEmail() rejects '' even with @IsOptional()
-  if (!leadData.email) delete leadData.email;
-
-  var apiOk = false;
-  var apiHttp = 0;
-
-  // Layer 1: Greenfield API
-  try {
-    var res = await fetch(API_BASE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(leadData),
+  var accepted = false;
+  if (window.GFLeads) {
+    var r = await GFLeads.submit(leadData, {
+      formName: formName,
+      waMode: 'open',
+      waMessage: function(p) {
+        return 'I\'d like a consultation:\nName: ' + (p.name || '') +
+          '\nPhone: ' + (p.phone || '') +
+          '\nEmail: ' + (p.email || 'N/A') +
+          '\nTreatment: ' + (p.treatment || 'N/A');
+      },
     });
-    apiOk = res.ok;
-    apiHttp = res.status;
-  } catch(e) {
-    apiOk = false;
-  }
-
-  if (apiOk) {
-    // Layer 2: Google Sheet
-    sendToSheet(leadData, formName, true);
-  } else if (apiHttp === 429) {
-    // Rate-limited (5 req/min/IP — quick repeat submissions, e.g. testing).
-    // The lead is NOT lost: retry once after the limit window; only alert
-    // (⚠ email + failed status) if the retry also fails. No WhatsApp popup
-    // here — 70s after the click it would be popup-blocked anyway.
-    sendToSheet(leadData, formName, 'rate-limited (auto-retry)');
-    var queuedAt = queueLead(leadData);
-    setTimeout(function() {
-      fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(leadData),
-      }).then(function(r) {
-        if (r.ok) { dequeueLead(queuedAt); sendToSheet(leadData, formName, 'success (retried)'); }
-        else { sendToSheet(leadData, formName, false); }
-      }).catch(function() { sendToSheet(leadData, formName, false); });
-    }, 70000);
+    accepted = r.accepted;
   } else {
-    // Hard failure (network down, 4xx/5xx): full safety net.
-    sendToSheet(leadData, formName, false);
-    queueLead(leadData);
-    whatsappFallback(leadData);
+    // Runtime failed to load — last-resort direct post.
+    try {
+      var res = await fetch('https://lead.greenfield.clinic/api/public/lead', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(leadData),
+      });
+      accepted = res.ok;
+    } catch(e) {}
   }
-
-  // Tracking (always)
-  fireConversions(formName, apiOk);
-
-  return apiOk;
+  fireConversions(formName);
+  return accepted;
 }
 
 // ── Multi-step Form ──
